@@ -11,7 +11,7 @@ import sqlite3
 app = Flask(__name__)
 CORS(app)
 
-github_token = "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"
+github_token = "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"
 
 
 @app.route('/', )
