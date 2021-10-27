@@ -11,7 +11,22 @@ import sqlite3
 app = Flask(__name__)
 CORS(app)
 
-github_token = ""
+# get github token
+con = sqlite3.connect('defi_data.db')
+cur = con.cursor()
+
+# Insert a row of data
+cur.execute("SELECT * FROM token LIMIT 1")
+
+row = cur.fetchone()
+github_token = row[1]
+# Save (commit) the changes
+con.commit()
+
+# We can also close the connection if we are done with it.
+# Just be sure any changes have been committed or they will be lost.
+con.close()
+
 
 
 @app.route('/', )
