@@ -11,6 +11,8 @@ import sqlite3
 app = Flask(__name__)
 CORS(app)
 
+github_token = "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"
+
 
 @app.route('/', )
 def hello_world():
@@ -40,7 +42,7 @@ def find_hours(json_obj, name):
 
 # get pie chart data in geojson file
 def piechart_data():
-    g = Github("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")
+    g = Github(github_token)
     repo = g.get_repo("chnuessli/defi_data")
 
     try:
@@ -76,7 +78,7 @@ def barchart_data():
     with open('match.json', encoding="utf8") as f:
         match_data = json.load(f)
 
-    g = Github("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")
+    g = Github(github_token)
     repo = g.get_repo("chnuessli/defi_data")
     contents = repo.get_contents("data/json")
     keyword = 'defis_kt'
@@ -136,7 +138,7 @@ def linechart_data():
 
 # get file name counts that include "dispo" string
 def find_dispo():
-    g = Github("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")
+    g = Github(github_token)
     repo = g.get_repo("chnuessli/defi_data")
     contents = repo.get_contents("data/json")
     keyword = 'dispo'
@@ -165,7 +167,7 @@ def get_blob_content(repo, branch, path_name):
 @app.route('/api', methods=['GET'])
 def fetch_json():
     result_data = {}
-    g = Github("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")
+    g = Github(github_token)
     repo = g.get_repo("chnuessli/defi_data")
     try:
         file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="sha")
