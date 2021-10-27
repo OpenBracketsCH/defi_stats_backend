@@ -165,7 +165,7 @@ def get_blob_content(repo, branch, path_name):
 @app.route('/api', methods=['GET'])
 def fetch_json():
     result_data = {}
-    g = Github("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")
+    g = Github("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")
     repo = g.get_repo("chnuessli/defi_data")
     try:
         file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="sha")
