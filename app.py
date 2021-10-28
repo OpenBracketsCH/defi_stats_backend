@@ -1,16 +1,12 @@
 from flask import Flask
 from github import Github
-import requests
 import json
-import os
 from flask import jsonify
 from flask_cors import CORS
 import base64
 import sqlite3
 from datetime import datetime
-
-app = Flask(__name__)
-CORS(app)
+from apscheduler.schedulers.background import BackgroundScheduler
 
 # decoded github token
 git_data = "Z2hwX2V3TE5iM2tyYzNyZ3RMOFVTUGJQQ09iVVlmQVFpTDF5ejRiaA=="
@@ -20,6 +16,37 @@ github_token = message_bytes.decode('ascii')
 
 g = Github(github_token)
 repo = g.get_repo("chnuessli/defi_data")
+
+
+# running function daily 12:00PM
+def fetch_defi():
+    try:
+        file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="sha")
+        data = json.loads(file_content.decoded_content.decode())
+    except:
+        file_content = get_blob_content(repo, "main", "data/json/defis_switzerland.geojson")
+        data = json.loads(base64.b64decode(file_content.content))
+    all_defi = find_defi(data["features"], "Feature")
+    today = datetime.today().strftime('%Y-%m-%d')
+    con = sqlite3.connect('defi_data.db')
+    cur = con.cursor()
+
+    # Insert a row of data
+    cur.execute("INSERT INTO defi_data (value,time) VALUES (?, ?)", (all_defi, today))
+
+    # Save (commit) the changes
+    con.commit()
+
+    # We can also close the connection if we are done with it.
+    # Just be sure any changes have been committed or they will be lost.
+    con.close()
+
+
+scheduler = BackgroundScheduler(timezone='CET')
+scheduler.add_job(func=fetch_defi, trigger="cron", hour='12', minute='00')
+scheduler.start()
+app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/', )
@@ -162,30 +189,6 @@ def get_blob_content(repo, branch, path_name):
         return None
     # we have sha
     return repo.get_git_blob(sha[0])
-
-
-# running function daily 12:00PM
-def fetch_defi():
-    try:
-        file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="sha")
-        data = json.loads(file_content.decoded_content.decode())
-    except:
-        file_content = get_blob_content(repo, "main", "data/json/defis_switzerland.geojson")
-        data = json.loads(base64.b64decode(file_content.content))
-    all_defi = find_defi(data["features"], "Feature")
-    today = datetime.today().strftime('%Y-%m-%d')
-    con = sqlite3.connect('defi_data.db')
-    cur = con.cursor()
-
-    # Insert a row of data
-    cur.execute("INSERT INTO defi_data (value,time) VALUES (?, ?)", (all_defi, today))
-
-    # Save (commit) the changes
-    con.commit()
-
-    # We can also close the connection if we are done with it.
-    # Just be sure any changes have been committed or they will be lost.
-    con.close()
 
 
 # app route api get method make data
