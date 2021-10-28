@@ -7,15 +7,19 @@ from flask import jsonify
 from flask_cors import CORS
 import base64
 import sqlite3
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
-with open('token.json', encoding="utf8") as f:
-    git_data = json.load(f)
-    base64_bytes = git_data["token"].encode('ascii')
-    message_bytes = base64.b64decode(base64_bytes)
-    github_token = message_bytes.decode('ascii')
+# decoded github token
+git_data = "Z2hwX2V3TE5iM2tyYzNyZ3RMOFVTUGJQQ09iVVlmQVFpTDF5ejRiaA=="
+base64_bytes = git_data.encode('ascii')
+message_bytes = base64.b64decode(base64_bytes)
+github_token = message_bytes.decode('ascii')
+
+g = Github(github_token)
+repo = g.get_repo("chnuessli/defi_data")
 
 
 @app.route('/', )
@@ -46,9 +50,6 @@ def find_hours(json_obj, name):
 
 # get pie chart data in geojson file
 def piechart_data():
-    g = Github(github_token)
-    repo = g.get_repo("chnuessli/defi_data")
-
     try:
         file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="sha")
         data = json.loads(file_content.decoded_content.decode())
@@ -82,8 +83,6 @@ def barchart_data():
     with open('match.json', encoding="utf8") as f:
         match_data = json.load(f)
 
-    g = Github(github_token)
-    repo = g.get_repo("chnuessli/defi_data")
     contents = repo.get_contents("data/json")
     keyword = 'defis_kt'
     result = {}
@@ -142,8 +141,6 @@ def linechart_data():
 
 # get file name counts that include "dispo" string
 def find_dispo():
-    g = Github(github_token)
-    repo = g.get_repo("chnuessli/defi_data")
     contents = repo.get_contents("data/json")
     keyword = 'dispo'
     result = 0
@@ -167,12 +164,34 @@ def get_blob_content(repo, branch, path_name):
     return repo.get_git_blob(sha[0])
 
 
+# running function daily 12:00PM
+def fetch_defi():
+    try:
+        file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="sha")
+        data = json.loads(file_content.decoded_content.decode())
+    except:
+        file_content = get_blob_content(repo, "main", "data/json/defis_switzerland.geojson")
+        data = json.loads(base64.b64decode(file_content.content))
+    all_defi = find_defi(data["features"], "Feature")
+    today = datetime.today().strftime('%Y-%m-%d')
+    con = sqlite3.connect('defi_data.db')
+    cur = con.cursor()
+
+    # Insert a row of data
+    cur.execute("INSERT INTO defi_data (value,time) VALUES (?, ?)", (all_defi, today))
+
+    # Save (commit) the changes
+    con.commit()
+
+    # We can also close the connection if we are done with it.
+    # Just be sure any changes have been committed or they will be lost.
+    con.close()
+
+
 # app route api get method make data
 @app.route('/api', methods=['GET'])
 def fetch_json():
     result_data = {}
-    g = Github(github_token)
-    repo = g.get_repo("chnuessli/defi_data")
     try:
         file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="sha")
         data = json.loads(file_content.decoded_content.decode())
