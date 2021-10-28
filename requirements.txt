@@ -1,10 +1,12 @@
+APScheduler==3.8.1
+backports.zoneinfo==0.2.1
 certifi==2021.10.8
 cffi==1.15.0
 charset-normalizer==2.0.7
 click
 colorama==0.4.4
 Deprecated==1.2.13
-Flask
+flask
 Flask-Cors==3.0.10
 gunicorn==20.1.0
 idna==3.3
@@ -16,8 +18,12 @@ pycparser==2.20
 PyGithub==1.55
 PyJWT==2.3.0
 PyNaCl==1.4.0
+pytz==2021.3
+pytz-deprecation-shim==0.1.0.post0
 requests==2.26.0
 six==1.16.0
+tzdata==2021.5
+tzlocal==4.0.2
 urllib3==1.26.7
 Werkzeug
 wincertstore==0.2

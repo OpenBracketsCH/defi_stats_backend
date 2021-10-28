@@ -57,8 +57,8 @@ def hello_world():
 # find all defi amount in geojson file
 def find_defi(json_obj, name):
     amount = 0
-    for dict in json_obj:
-        if dict['type'] == name:
+    for dicts in json_obj:
+        if dicts['type'] == name:
             amount += 1
     return amount
 
@@ -66,11 +66,11 @@ def find_defi(json_obj, name):
 # find all 24/7 opening hours amount in geojson file
 def find_hours(json_obj, name):
     amount = 0
-    for dict in json_obj:
-        if "opening_hours" not in dict["properties"]:
+    for dicts in json_obj:
+        if "opening_hours" not in dicts["properties"]:
             continue
         else:
-            if dict["properties"]["opening_hours"] == name:
+            if dicts["properties"]["opening_hours"] == name:
                 amount += 1
     return amount
 
@@ -89,11 +89,11 @@ def piechart_data():
     unknown_amount = 0
     opening_only = 0
     opening_24 = 0
-    for dict in json_obj:
-        if "opening_hours" not in dict["properties"]:
+    for dicts in json_obj:
+        if "opening_hours" not in dicts["properties"]:
             unknown_amount += 1
         else:
-            if dict["properties"]["opening_hours"] == "24/7":
+            if dicts["properties"]["opening_hours"] == "24/7":
                 opening_24 += 1
             else:
                 opening_only += 1
@@ -177,18 +177,18 @@ def find_dispo():
     return result
 
 
-def get_blob_content(repo, branch, path_name):
+def get_blob_content(blob_repo, branch, path_name):
     # first get the branch reference
-    ref = repo.get_git_ref(f'heads/{branch}')
+    ref = blob_repo.get_git_ref(f'heads/{branch}')
     # then get the tree
-    tree = repo.get_git_tree(ref.object.sha, recursive='/' in path_name).tree
+    tree = blob_repo.get_git_tree(ref.object.sha, recursive='/' in path_name).tree
     # look for path in tree
     sha = [x.sha for x in tree if x.path == path_name]
     if not sha:
         # well, not found..
         return None
     # we have sha
-    return repo.get_git_blob(sha[0])
+    return blob_repo.get_git_blob(sha[0])
 
 
 # app route api get method make data
