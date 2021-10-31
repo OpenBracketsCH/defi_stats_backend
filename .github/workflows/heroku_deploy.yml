@@ -3,7 +3,7 @@ name: Deploy Defi Backend
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
