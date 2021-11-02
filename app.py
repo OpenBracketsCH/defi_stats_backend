@@ -9,7 +9,7 @@ from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 
 # decoded github token
-git_data = "Z2hwX0ducEt6cGRTeWlkdzJ2YlNrY0dNWFJsbWIyenI2OTFuVUhtTw===="
+git_data = "Z2hwX3ZOQXRFNG9DQzlrem93Ym9VdHZrRlRCRk5JNzBhTDJzSDFWSA=="
 base64_bytes = git_data.encode('ascii')
 message_bytes = base64.b64decode(base64_bytes)
 github_token = message_bytes.decode('ascii')
