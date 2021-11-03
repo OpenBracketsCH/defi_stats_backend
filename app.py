@@ -20,6 +20,7 @@ repo = g.get_repo("chnuessli/defi_data")
 
 # running function daily 12:00PM
 def fetch_defi():
+
     try:
         file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="sha")
         data = json.loads(file_content.decoded_content.decode())
