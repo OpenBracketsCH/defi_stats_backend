@@ -45,7 +45,8 @@ def fetch_defi():
 
 scheduler = BackgroundScheduler(timezone="CET")
 # scheduler.add_job(func=fetch_defi, trigger="='12', minute='00')
-scheduler.add_job(func=fetch_defi, trigger="cron", hour="12", minute='00',second="00")
+# scheduler.add_job(func=fetch_defi, trigger="cron", hour="12", minute='00',second="00")
+scheduler.add_job(func=fetch_defi, trigger="cron", second="00")
 scheduler.start()
 app = Flask(__name__)
 CORS(app)
