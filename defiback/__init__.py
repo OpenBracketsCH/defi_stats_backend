@@ -49,10 +49,6 @@ scheduler.add_job(func=fetch_defi, trigger="cron", hour="13", minute='05')
 # scheduler.add_job(func=fetch_defi, trigger="cron", second="00")
 scheduler.start()
 app = Flask(__name__)
-app.config.update(
-    DEBUG = False,
-    use_reloader = False
-)
 CORS(app)
 
 
