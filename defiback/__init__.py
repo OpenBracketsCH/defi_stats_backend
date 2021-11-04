@@ -8,6 +8,7 @@ import sqlite3
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 
+
 # decoded github token
 git_data = "Z2hwX3ZOQXRFNG9DQzlrem93Ym9VdHZrRlRCRk5JNzBhTDJzSDFWSA=="
 base64_bytes = git_data.encode('ascii')
@@ -45,7 +46,7 @@ def fetch_defi():
 
 scheduler = BackgroundScheduler(timezone="CET")
 # scheduler.add_job(func=fetch_defi, trigger="='12', minute='00')
-scheduler.add_job(func=fetch_defi, trigger="cron", hour="14", minute='25')
+scheduler.add_job(func=fetch_defi, trigger="cron", hour="15", minute='35')
 # scheduler.add_job(func=fetch_defi, trigger="cron", second="00")
 scheduler.start()
 app = Flask(__name__)
@@ -227,6 +228,8 @@ def fetch_json():
     return return_data
 
 
-def getApp():
-    return app
+# def getApp():
+#     return app
+if __name__ == "__main__":
+    app.run()
 
