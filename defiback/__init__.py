@@ -46,7 +46,7 @@ def fetch_defi():
 
 scheduler = BackgroundScheduler(timezone="CET")
 # scheduler.add_job(func=fetch_defi, trigger="='12', minute='00')
-scheduler.add_job(func=fetch_defi, trigger="cron", hour="15", minute='40')
+scheduler.add_job(func=fetch_defi, trigger="cron", hour="15", minute='47')
 # scheduler.add_job(func=fetch_defi, trigger="cron", second="00")
 scheduler.start()
 app = Flask(__name__)
@@ -150,7 +150,7 @@ def linechart_data():
 
     # select a row of data
     cur.execute("""SELECT * FROM (
-                   SELECT * FROM defi_data ORDER BY id DESC LIMIT 7
+                   SELECT * FROM defi_data GROUP BY time ORDER BY id  DESC LIMIT 7 
                 )Var1
                    ORDER BY id ASC;""")
 
@@ -228,8 +228,6 @@ def fetch_json():
     return return_data
 
 
-# def getApp():
-#     return app
-if __name__ == "__main__":
-    app.run(use_reloader=False)
+def getApp():
+    return app
 
