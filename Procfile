@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app --no-reload
+web: gunicorn wsgi:app --reload=False
