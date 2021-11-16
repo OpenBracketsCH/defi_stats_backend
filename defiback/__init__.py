@@ -46,7 +46,7 @@ def fetch_defi():
 
 scheduler = BackgroundScheduler(timezone="CET")
 # scheduler.add_job(func=fetch_defi, trigger="='12', minute='00')
-scheduler.add_job(func=fetch_defi, trigger="cron",  minute='00')
+scheduler.add_job(func=fetch_defi, trigger="cron",  hour='12')
 # scheduler.add_job(func=fetch_defi, trigger="cron", second="00")
 scheduler.start()
 app = Flask(__name__)
@@ -99,8 +99,9 @@ def piechart_data():
         else:
             if dicts["properties"]["opening_hours"] == "24/7":
                 opening_24 += 1
-            else:
-                opening_only += 1                
+            # else:
+            #     opening_only += 1
+            opening_only += 1
     pie_data["all"] = amount
     pie_data["unknown"] = unknown_amount
     pie_data["open_only"] = opening_only
