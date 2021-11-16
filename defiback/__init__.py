@@ -100,13 +100,11 @@ def piechart_data():
             if dicts["properties"]["opening_hours"] == "24/7":
                 opening_24 += 1
             else:
-                opening_only += 1
-                
+                opening_only += 1                
     pie_data["all"] = amount
     pie_data["unknown"] = unknown_amount
     pie_data["open_only"] = opening_only
     pie_data["open_24"] = opening_24
-    pie_data["open_not_24"] = opening_not_24
 
     return pie_data
 
