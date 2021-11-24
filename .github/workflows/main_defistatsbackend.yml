@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'defistatsbackend'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B7C99AC6B28F4CCC8ADC189D80963028 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FCC4B43111BE48199E79F3610E42D5CD }}
