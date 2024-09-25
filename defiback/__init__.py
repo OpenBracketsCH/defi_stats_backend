@@ -16,7 +16,7 @@ message_bytes = base64.b64decode(base64_bytes)
 github_token = message_bytes.decode('ascii')
 
 g = Github(github_token)
-repo = g.get_repo("chnuessli/defi_data")
+repo = g.get_repo("OpenBracketsCH/defi_data")
 
 
 # running function daily 12:00PM
