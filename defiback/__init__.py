@@ -25,7 +25,7 @@ scheduler.start()
 
 @app.route('/')
 def hello_world():
-    return 'Welcome to the DeFi Data API!'
+    return 'Welcome to the DeFi Data API!\n FLASK_ENV is set to: {os.environ.get("FLASK_ENV")}'
 
 def fetch_geojson_data():
     """Fetches the geojson data from the GitHub repository."""
