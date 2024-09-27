@@ -9,7 +9,6 @@ from flask_cors import CORS
 import os
 
 
-# Decoded GitHub token
 g_token = os.getenv("GITHUB_TOKEN")
 
 g = Github(g_token)
