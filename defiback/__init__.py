@@ -9,9 +9,9 @@ from flask_cors import CORS
 
 # Decoded GitHub token
 git_data = "Z2l0aHViX3BhdF8xMUFQQ1M3QVkwUXlWZXNBcGV5MWtMX3RnQW81Vm04azd5b0lyRlF3OTlGeVZmVEFFQmFFb3pzN2JWRkZva0xkTVJMUVlEN1o3Q2lEa3h6OHJp"
-github_token = base64.b64decode(git_data.encode('ascii')).decode('ascii')
+g_token= base64.b64decode(git_data.encode('ascii')).decode('ascii')
 
-g = Github(github_token)
+g = Github(g_token)
 repo = g.get_repo("OpenBracketsCH/defi_data")
 
 # Initialize Flask app and CORS
