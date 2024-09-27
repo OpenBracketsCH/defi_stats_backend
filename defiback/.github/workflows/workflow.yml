@@ -7,3 +7,6 @@ jobs:
 
       - name: Use the secret in a script
         run: echo DEFISTATSBACKEND
+        
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
