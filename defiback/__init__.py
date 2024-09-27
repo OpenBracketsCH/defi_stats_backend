@@ -143,6 +143,12 @@ def find_hours(json_obj, name):
     """Counts the number of DeFi entries with specified opening hours."""
     return sum(1 for entry in json_obj if entry.get("properties", {}).get("opening_hours") == name)
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # log the error
+    print(f"Error: {e}")
+    return jsonify(error=str(e)), 500
+
 def getApp():
     """Returns the Flask app instance."""
     return app
