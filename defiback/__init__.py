@@ -8,7 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask_cors import CORS
 
 # Decoded GitHub token
-git_data = "Z2l0aHViX3BhdF8xMUFQQ1M3QVkwUXlWZXNBcGV5MWtMX3RnQW81Vm04azd5b0lyRlF3OTlGeVZmVEFFQmFFb3pzN2JWRkZva0xkTVJMUVlEN1o3Q2lEa3h6OHJp"
+git_data = "Z2l0aHViX3BhdF8xMUFQQ1M3QVkwMndWbFd5VFpmWEdzXzlTVXc3ZjVVRlEzYUUxVjByV1JjUEdhOHE2MzJ2ZnlWdkhjUUE0YXpsbm5HVFNZM1dUNmhYOTVoV2lV"
 g_token= base64.b64decode(git_data.encode('ascii')).decode('ascii')
 
 g = Github(g_token)
