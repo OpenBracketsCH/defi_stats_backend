@@ -6,10 +6,11 @@ import sqlite3
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_cors import CORS
+import os
+
 
 # Decoded GitHub token
-git_data = "Z2l0aHViX3BhdF8xMUFQQ1M3QVkwUXlWZXNBcGV5MWtMX3RnQW81Vm04azd5b0lyRlF3OTlGeVZmVEFFQmFFb3pzN2JWRkZva0xkTVJMUVlEN1o3Q2lEa3h6OHJp"
-g_token= base64.b64decode(git_data.encode('ascii')).decode('ascii')
+g_token = os.getenv("GITHUB_TOKEN")
 
 g = Github(g_token)
 repo = g.get_repo("OpenBracketsCH/defi_data")
