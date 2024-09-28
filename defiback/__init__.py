@@ -1,12 +1,12 @@
 from flask import Flask, jsonify
 from github import Github
 import json
-import base64
 import sqlite3
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_cors import CORS
 import os
+import requests
 
 
 g_token = os.getenv("GITHUB_TOKEN")
@@ -17,7 +17,6 @@ repo = g.get_repo("OpenBracketsCH/defi_data")
 # Initialize Flask app and CORS
 app = Flask(__name__)
 CORS(app)
-
 # Scheduler for daily fetch at 12:00 PM
 scheduler = BackgroundScheduler(timezone="CET")
 scheduler.add_job(func=lambda: fetch_defi(), trigger="cron", minute='00')
@@ -28,10 +27,17 @@ def hello_world():
     return 'Welcome to the DeFi Data API!\n FLASK_ENV is set to: {os.environ.get("FLASK_ENV")}'
 
 def fetch_geojson_data():
+    global global_geojson_data
     """Fetches the geojson data from the GitHub repository."""
     try:
         file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="main")
-        return json.loads(file_content.decoded_content.decode())
+        response = requests.get(file_content.download_url, headers={
+        'accept': 'application/vnd.github.v3.raw'
+      })
+        response.raise_for_status()  
+        decoded_content = response.json()
+        global_geojson_data = decoded_content
+        return decoded_content
     except Exception as e:
         print(f"Error fetching geojson data: {e}")
         return None
@@ -56,7 +62,7 @@ def find_defi(json_obj, name):
 
 def piechart_data():
     """Generates pie chart data from geojson file."""
-    data = fetch_geojson_data()
+    data = global_geojson_data
     if data is None:
         return {}
 
@@ -83,8 +89,10 @@ def barchart_data():
     for content_file in contents:
         if 'defis_kt' in content_file.name:
             try:
-                file_content = repo.get_contents(content_file.path)
-                data = json.loads(file_content.decoded_content.decode())
+                file_content = repo.get_contents(content_file.path, ref="main")
+                response = requests.get(file_content.download_url)
+                response.raise_for_status()  # Raise an error for bad responses
+                data = response.json()
                 each_defi = find_defi(data["features"], "Feature")
                 match_name = content_file.name.replace("defis_kt_", "").replace(".geojson", "")
                 bar_data["label"].append(match_data.get(match_name, match_name))
@@ -120,24 +128,28 @@ def find_dispo():
 
 @app.route('/api', methods=['GET'])
 def fetch_json():
-    """Fetches and returns combined data from various sources."""
-    result_data = {}
-    data = fetch_geojson_data()
-    if data is None:
-        return jsonify({"error": "Could not fetch data"}), 500
+    try:
+        """Fetches and returns combined data from various sources."""
+        result_data = {}
+        data = fetch_geojson_data()
+        if data is None:
+            return jsonify({"error": "Could not fetch data"}), 500
 
-    all_defi = find_defi(data["features"], "Feature")
-    all_hours = find_hours(data["features"], "24/7")
-    dispo_data = find_dispo()
+        all_defi = find_defi(data["features"], "Feature")
+        all_hours = find_hours(data["features"], "24/7")
+        dispo_data = find_dispo()
 
-    result_data["all"] = all_defi
-    result_data["hours"] = all_hours
-    result_data["dispo"] = dispo_data
-    result_data["bar_data"] = barchart_data()
-    result_data["pie_data"] = piechart_data()
-    result_data["line_data"] = linechart_data()
+        result_data["all"] = all_defi
+        result_data["hours"] = all_hours
+        result_data["dispo"] = dispo_data
+        result_data["bar_data"] = barchart_data()
+        result_data["pie_data"] = piechart_data()
+        result_data["line_data"] = linechart_data()
 
-    return jsonify(result_data)
+        return jsonify(result_data)
+    except Exception as e:
+        print(f"Error : {e}")
+        return jsonify([])
 
 def find_hours(json_obj, name):
     """Counts the number of DeFi entries with specified opening hours."""
