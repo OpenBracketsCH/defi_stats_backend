@@ -27,6 +27,7 @@ def hello_world():
     return 'Welcome to the DeFi Data API!\n FLASK_ENV is set to: {os.environ.get("FLASK_ENV")}'
 
 def fetch_geojson_data():
+    global global_geojson_data
     """Fetches the geojson data from the GitHub repository."""
     try:
         file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="main")
@@ -34,6 +35,7 @@ def fetch_geojson_data():
         response = requests.get(file_content.download_url)
         response.raise_for_status()  
         decoded_content = response.json()
+        global_geojson_data = decoded_content
         return decoded_content
     except Exception as e:
         print(f"Error fetching geojson data: {e}")
@@ -59,7 +61,7 @@ def find_defi(json_obj, name):
 
 def piechart_data():
     """Generates pie chart data from geojson file."""
-    data = fetch_geojson_data()
+    data = global_geojson_data
     if data is None:
         return {}
 
@@ -86,7 +88,7 @@ def barchart_data():
     for content_file in contents:
         if 'defis_kt' in content_file.name:
             try:
-                file_content = repo.get_contents(content_file.path)
+                file_content = repo.get_contents(content_file.path, ref="main")
                 response = requests.get(file_content.download_url)
                 response.raise_for_status()  # Raise an error for bad responses
                 data = response.json()
