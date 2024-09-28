@@ -12,7 +12,7 @@ import requests
 g_token = os.getenv("GITHUB_TOKEN")
 
 g = Github(g_token)
-repo = g.get_repo("OpenBracketsCH/defi_data")
+repo = g.get_repo("chnuessli/defi_data")
 
 # Initialize Flask app and CORS
 app = Flask(__name__)
