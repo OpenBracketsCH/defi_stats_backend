@@ -8,7 +8,6 @@ from flask_cors import CORS
 import os
 import requests
 
-
 g_token = os.getenv("GITHUB_TOKEN")
 
 g = Github(g_token)
@@ -78,7 +77,7 @@ def barchart_data():
     with open('match.json', encoding="utf8") as f:
         match_data = json.load(f)
 
-    contents = repo.get_contents("data/json")
+    contents = repo.get_contents("data/json", ref="main")
     bar_data = {
         "label": [],
         "data": []
@@ -88,13 +87,14 @@ def barchart_data():
         if 'defis_kt' in content_file.name:
             try:
                 file_content = repo.get_contents(content_file.path, ref="main")
-                response = requests.get(file_content.download_url)
-                response.raise_for_status()  # Raise an error for bad responses
-                data = response.json()
-                each_defi = find_defi(data["features"], "Feature")
-                match_name = content_file.name.replace("defis_kt_", "").replace(".geojson", "")
-                bar_data["label"].append(match_data.get(match_name, match_name))
-                bar_data["data"].append(each_defi)
+                if(file_content):
+                    response = requests.get(file_content.download_url)
+                    response.raise_for_status()  # Raise an error for bad responses
+                    data = response.json()
+                    each_defi = find_defi(data["features"], "Feature")
+                    match_name = content_file.name.replace("defis_kt_", "").replace(".geojson", "")
+                    bar_data["label"].append(match_data.get(match_name, match_name))
+                    bar_data["data"].append(each_defi)
             except Exception as e:
                 print(f"Error processing file {content_file.name}: {e}")
 
