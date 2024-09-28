@@ -7,11 +7,16 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask_cors import CORS
 import os
 import requests
+from requests.structures import CaseInsensitiveDict
+
 
 g_token = os.getenv("GITHUB_TOKEN")
-
 g = Github(g_token)
 repo = g.get_repo("chnuessli/defi_data")
+
+headers = CaseInsensitiveDict()
+headers["Accept"] = "application/vnd.github.v3.raw"
+headers["Authorization"] = f"Bearer {g_token}"
 
 # Initialize Flask app and CORS
 app = Flask(__name__)
@@ -23,17 +28,18 @@ scheduler.start()
 
 @app.route('/')
 def hello_world():
-    return 'Welcome to the DeFi Data API!\n FLASK_ENV is set to: {os.environ.get("FLASK_ENV")}'
+    return 'Welcome to the DeFi Data API!\n'
 
 def fetch_geojson_data():
     """Fetches the geojson data from the GitHub repository."""
     try:
+        print(repo)
         file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="main")
-    #     response = requests.get(file_content.download_url, headers={
-    #     'accept': 'application/vnd.github.v3.raw'
-    #   })
-        response = requests.get(file_content.download_url)
-        decoded_content = response.json()
+        if(file_content.encoding == "none"):
+            response = requests.get(file_content.download_url, headers=headers)
+            decoded_content = response.json()
+        else:
+            decoded_content = json.loads(file_content.decoded_content.decode())
         return decoded_content
     except Exception as e:
         print(f"Error fetching geojson data: {e}")
@@ -87,14 +93,16 @@ def barchart_data():
         if 'defis_kt' in content_file.name:
             try:
                 file_content = repo.get_contents(content_file.path, ref="main")
-                if(file_content):
-                    response = requests.get(file_content.download_url)
-                    response.raise_for_status()  # Raise an error for bad responses
+                if(file_content.encoding == "none"):
+                    response = requests.get(file_content.download_url, headers=headers)
                     data = response.json()
-                    each_defi = find_defi(data["features"], "Feature")
-                    match_name = content_file.name.replace("defis_kt_", "").replace(".geojson", "")
-                    bar_data["label"].append(match_data.get(match_name, match_name))
-                    bar_data["data"].append(each_defi)
+                else:
+                    data = json.loads(file_content.decoded_content.decode())
+
+                each_defi = find_defi(data["features"], "Feature")
+                match_name = content_file.name.replace("defis_kt_", "").replace(".geojson", "")
+                bar_data["label"].append(match_data.get(match_name, match_name))
+                bar_data["data"].append(each_defi)
             except Exception as e:
                 print(f"Error processing file {content_file.name}: {e}")
 
@@ -133,16 +141,13 @@ def fetch_json():
         if data is None:
             return jsonify({"error": "Could not fetch data"}), 500
 
-        all_defi = find_defi(data["features"], "Feature")
-        all_hours = find_hours(data["features"], "24/7")
-        dispo_data = find_dispo()
-
-        result_data["all"] = all_defi
-        result_data["hours"] = all_hours
-        result_data["dispo"] = dispo_data
+        result_data["all"] = find_defi(data["features"], "Feature")
+        result_data["hours"] = find_hours(data["features"], "24/7")
+        result_data["dispo"] = find_dispo()
         result_data["bar_data"] = barchart_data()
         result_data["pie_data"] = piechart_data()
         result_data["line_data"] = linechart_data()
+            
 
         return jsonify(result_data)
     except Exception as e:
