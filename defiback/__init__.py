@@ -34,9 +34,7 @@ def fetch_geojson_data():
     #     'accept': 'application/vnd.github.v3.raw'
     #   })
         response = requests.get(file_content.download_url)
-        response.raise_for_status()  
         decoded_content = response.json()
-        global_geojson_data = decoded_content
         return decoded_content
     except Exception as e:
         print(f"Error fetching geojson data: {e}")
@@ -154,12 +152,6 @@ def fetch_json():
 def find_hours(json_obj, name):
     """Counts the number of DeFi entries with specified opening hours."""
     return sum(1 for entry in json_obj if entry.get("properties", {}).get("opening_hours") == name)
-
-@app.errorhandler(Exception)
-def handle_exception(e):
-    # log the error
-    print(f"Error: {e}")
-    return jsonify(error=str(e)), 500
 
 def getApp():
     """Returns the Flask app instance."""
