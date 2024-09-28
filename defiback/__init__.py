@@ -32,7 +32,9 @@ def fetch_geojson_data():
     try:
         file_content = repo.get_contents("data/json/defis_switzerland.geojson", ref="main")
         print(file_content)
-        response = requests.get(file_content.download_url)
+        response = requests.get(file_content.download_url, headers={
+        'accept': 'application/vnd.github.v3.raw'
+      })
         response.raise_for_status()  
         decoded_content = response.json()
         global_geojson_data = decoded_content
