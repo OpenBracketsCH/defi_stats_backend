@@ -8,9 +8,13 @@ from flask_cors import CORS
 import os
 import requests
 from requests.structures import CaseInsensitiveDict
+import logging
+logging.basicConfig(level=logging.INFO)
+
 
 
 g_token = os.getenv("DEFISTATSBACKEND")
+logging.info("Current token is: %s", g_token)
 g = Github(g_token)
 repo = g.get_repo("chnuessli/defi_data")
 
