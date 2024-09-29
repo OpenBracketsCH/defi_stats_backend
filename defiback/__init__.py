@@ -10,7 +10,7 @@ import requests
 from requests.structures import CaseInsensitiveDict
 
 
-g_token = os.getenv("GITHUB_TOKEN")
+g_token = os.getenv("DEFISTATSBACKEND")
 g = Github(g_token)
 repo = g.get_repo("chnuessli/defi_data")
 
