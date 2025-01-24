@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 g_token = os.getenv("DEFISTATSBACKEND")
 logging.info("Current token is: %s", g_token)
 g = Github(g_token)
-repo = g.get_repo("chnuessli/defi_data")
+repo = g.get_repo("OpenBracketsCH/defi_data")
 
 headers = CaseInsensitiveDict()
 headers["Accept"] = "application/vnd.github.v3.raw"
